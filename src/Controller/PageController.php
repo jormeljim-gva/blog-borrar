@@ -70,6 +70,7 @@ final class PageController extends AbstractController
     }
 
     #[Route('/blog/new', name: 'new_post')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
     {
         $post = new Post();
@@ -85,16 +86,33 @@ final class PageController extends AbstractController
             $post->setPostUser($this->getUser());
             $post->setNumLikes(0);
             $post->setNumComments(0);
-
+            //Gestiona la imagen
+            $imageFile = $form->get('image')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('kernel.project_dir') . '/public/images', $newFilename
+                );
+                $post->setImage($newFilename);
+            }
             $entityManager = $doctrine->getManager();    
             $entityManager->persist($post);
             $entityManager->flush();
-            return $this->render('new_post.html.twig', array(
-                'form' => $form->createView()    
-            ));
+            return $this->redirectToRoute('single_post', ["slug" => $post->getSlug()]);
         }
         return $this->render('new_post.html.twig', array(
             'form' => $form->createView()    
         ));
+        
+    }
+
+    #[Route('/single_post/{slug}', name: 'single_post')]
+    public function post(ManagerRegistry $doctrine, $slug): Response
+    {
+        $repositorio = $doctrine->getRepository(Post::class);
+        $post = $repositorio->findOneBy(["slug"=>$slug]);
+        return $this->render('single_post.html.twig', [
+            'post' => $post,
+        ]);
     }
 }
