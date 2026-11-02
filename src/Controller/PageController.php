@@ -13,6 +13,9 @@ use App\Form\ContactFormType;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Form\PostFormType;
 use App\Entity\Post;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Repository\PostRepository;
+
 
 
 final class PageController extends AbstractController
@@ -33,10 +36,15 @@ final class PageController extends AbstractController
 	    return $this->render('about.html.twig', []);
     }
 
-    #[Route('/blog', name: 'blog')]
-    public function blog(): Response
+    #[Route('/blog/{page}', name: 'blog', requirements: ['page' => '\d+'])]
+    public function blog(ManagerRegistry $doctrine, int $page = 1): Response
     {
-	    return $this->render('blog.html.twig', []);
+        $repository = $doctrine->getRepository(Post::class);
+        $posts = $repository->findAll($page);
+
+        return $this->render('blog.html.twig', [
+            'posts' => $posts,
+        ]);
     }
 
     #[Route('/contacto', name: 'contacto')]
@@ -115,4 +123,7 @@ final class PageController extends AbstractController
             'post' => $post,
         ]);
     }
+
+    
+
 }
