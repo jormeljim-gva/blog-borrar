@@ -74,7 +74,7 @@
       <!-- End of Blog Post -->
 
         {% for post in posts %}
-            {% include '_post.html.twig' with {'post':post} %}
+            {% include 'partials/_post.html.twig' with {'post':post} %}
         {% endfor %}
         
       <!-- Side bar -->  
@@ -133,6 +133,9 @@
                  <h4 class="text-left"><a href="single_post.html.twig"><strong>Consequuntur</strong></a></h4>
                </div>
              </div>
+             {% for recent in recents %}
+                {% include 'partials/_recent_post.html.twig' with {'recent':recent} %}
+             {% endfor %}
         </div>
       <!-- End of Side bar --> 
        

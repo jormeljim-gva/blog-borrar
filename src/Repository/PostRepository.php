@@ -17,12 +17,13 @@ class PostRepository extends ServiceEntityRepository
     }
 
     /**
-    * Returns an array of Post objects
+    * @return Post[] Returns an array of Post objects
     */
-    public function findAll(): array
+    public function findRecents(): array
     {
         return $this->createQueryBuilder('p')
             ->orderBy('p.publishedAt', 'DESC')
+            ->setMaxResults(5)
             ->getQuery()
             ->getResult()
         ;

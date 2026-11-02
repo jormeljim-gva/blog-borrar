@@ -15,7 +15,8 @@ use App\Form\PostFormType;
 use App\Entity\Post;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Repository\PostRepository;
-
+use App\Entity\Comment;
+use App\Form\CommentFormType;
 
 
 final class PageController extends AbstractController
@@ -41,9 +42,11 @@ final class PageController extends AbstractController
     {
         $repository = $doctrine->getRepository(Post::class);
         $posts = $repository->findAll($page);
+        $recents = $repository->findRecents();
 
         return $this->render('blog.html.twig', [
             'posts' => $posts,
+            'recents' => $recents
         ]);
     }
 
@@ -114,16 +117,40 @@ final class PageController extends AbstractController
         
     }
 
-    #[Route('/single_post/{slug}', name: 'single_post')]
-    public function post(ManagerRegistry $doctrine, $slug): Response
+   #[Route('/single_post/{slug}', name: 'single_post')]
+    public function post(ManagerRegistry $doctrine, Request $request, $slug): Response
     {
-        $repositorio = $doctrine->getRepository(Post::class);
-        $post = $repositorio->findOneBy(["slug"=>$slug]);
+        $repository = $doctrine->getRepository(Post::class);
+        $post = $repository->findOneBy(["slug"=>$slug]);
+        $recents = $repository->findRecents();
+        $comment = new Comment();
+        $form = $this->createForm(CommentFormType::class, $comment);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment = $form->getData();
+            $comment->setPost($post);  
+            //Aumentamos en 1 el número de comentarios del post
+            $post->setNumComments($post->getNumComments() + 1);
+            $entityManager = $doctrine->getManager();    
+            $entityManager->persist($comment);
+            $entityManager->flush();
+            return $this->redirectToRoute('single_post', ["slug" => $post->getSlug()]);
+        }
         return $this->render('single_post.html.twig', [
             'post' => $post,
+            'recents' => $recents,
+            'commentForm' => $form->createView()
         ]);
     }
 
-    
+  
 
+    #[Route('/blog/recent_posts', name: 'recent_posts')]
+    public function recentPosts(ManagerRegistry $doctrine): Response{
+        $repository = $doctrine->getRepository(Post::class);
+        $recents = $repository->findRecents();
+        return $this->render('partials/_recent_post.html.twig', [
+            'recents' => $recents
+        ]);
+    }
 }
