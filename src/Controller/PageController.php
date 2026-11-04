@@ -143,14 +143,14 @@ final class PageController extends AbstractController
         ]);
     }
 
-  
+    // #[Route('/blog/recent_posts', name: 'recent_posts')]
+    // public function recentPosts(ManagerRegistry $doctrine): Response{
+    //     $repository = $doctrine->getRepository(Post::class);
+    //     $recents = $repository->findRecents();
+    //     return $this->render('partials/_recent_post.html.twig', [
+    //         'recents' => $recents
+    //     ]);
+    // }
 
-    #[Route('/blog/recent_posts', name: 'recent_posts')]
-    public function recentPosts(ManagerRegistry $doctrine): Response{
-        $repository = $doctrine->getRepository(Post::class);
-        $recents = $repository->findRecents();
-        return $this->render('partials/_recent_post.html.twig', [
-            'recents' => $recents
-        ]);
-    }
+    
 }

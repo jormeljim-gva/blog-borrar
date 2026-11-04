@@ -51,8 +51,22 @@
         {% endfor %}
 
         <!-- Comments -->
+        <!-- <div class="row">
+            <div class="col-xs-12 col-sm-12 block2">
+                {# {{ include ('_post_comments.html.twig') }} #}
+            </div>
+        </div> -->
         <div class="row">
             <div class="col-xs-12 col-sm-12 block2">
+
+                <h3>{{ post.numComments }} comentarios</h3>
+
+                {% for comment in post.comments %}
+                    {{ include('partials/_comments.html.twig', {'comment': comment}) }}
+                {% else %}
+                    <p>Todavía no hay comentarios. ¡Sé el primero!</p>
+                {% endfor %}
+
                 {{ include ('_post_comments.html.twig') }}
             </div>
         </div>
