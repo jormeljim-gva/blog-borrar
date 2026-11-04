@@ -64,7 +64,7 @@
                 {% for comment in post.comments %}
                     {{ include('partials/_comments.html.twig', {'comment': comment}) }}
                 {% else %}
-                    <p>Todavía no hay comentarios. ¡Sé el primero!</p>
+                    <p>Todavía no hay comentarios.</p>
                 {% endfor %}
 
                 {{ include ('_post_comments.html.twig') }}

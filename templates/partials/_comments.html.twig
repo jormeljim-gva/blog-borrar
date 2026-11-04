@@ -1,10 +1,6 @@
-{% extends "base.html.twig" %}
-{% block title%}Comments{% endblock %}
-{% block body %}
 <div class="comment">
     <h4>{{ comment.name }}</h4>
     <p class="time">{{ comment.publishedAt | date('d F Y') }} - {{ comment.publishedAt | date('h:i A') }}</p>
     <hr>
     <p>{{ comment.text }}</p>
 </div>
-{%endblock%}
