@@ -21,7 +21,7 @@ use App\Form\CommentFormType;
 
 final class PageController extends AbstractController
 {
-    private const POSTS_PER_PAGE = 1;
+    private const POSTS_PER_PAGE = 5;
 
     #[Route('/', name: 'index')]
     public function index(ManagerRegistry $doctrine, Request $request): Response
@@ -196,15 +196,21 @@ final class PageController extends AbstractController
         ]);
     }
 
-    // Esto es innecesario:
-    // #[Route('/blog/recent_posts', name: 'recent_posts')]
-    // public function recentPosts(ManagerRegistry $doctrine): Response{
-    //     $repository = $doctrine->getRepository(Post::class);
-    //     $recents = $repository->findRecents();
-    //     return $this->render('partials/_recent_post.html.twig', [
-    //         'recents' => $recents
-    //     ]);
-    // }
+    #[Route('/single_post/{slug}/like', name: 'post_like')]
+    public function like(ManagerRegistry $doctrine, $slug): Response
+    {
+        $repository = $doctrine->getRepository(Post::class);
+        $post = $repository->findOneBy(["slug"=>$slug]);
+        if ($post){
+            // Haz un método llamado like() en la entidad Post que aumente en 1 numLikes
+            $post->like();
+            $entityManager = $doctrine->getManager();    
+            $entityManager->persist($post);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('single_post', ["slug" => $post->getSlug()]);
+
+    }
 
     
 }
