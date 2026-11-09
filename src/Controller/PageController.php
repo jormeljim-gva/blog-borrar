@@ -78,22 +78,16 @@ final class PageController extends AbstractController
     #[Route('/blog/buscar/{page}', name: 'blog_buscar')]
     public function buscar(ManagerRegistry $doctrine, Request $request, int $page = 1): Response
     {
-        $page = max(1, $page);
-
         $repository = $doctrine->getRepository(Post::class);
         $searchTerm = $request->query->get('searchTerm', '');
         $posts = $repository->findBuscadosPaginados($searchTerm, $page, self::POSTS_PER_PAGE);
         $recents = $repository->findRecents();
-
         $total = count($posts);
         $totalPages = max(1, (int) ceil($total / self::POSTS_PER_PAGE));
-
-        // Si piden una página que no existe, redirigimos a la última (conservando la búsqueda)
         if ($page > $totalPages) {
             return $this->redirectToRoute('blog_buscar', ['page' => $totalPages, 'searchTerm' => $searchTerm]);
         }
-
-        return $this->render('blog/blog.html.twig', [
+        return $this->render('blog.html.twig', [
             'posts'      => $posts,
             'recents'    => $recents,
             'searchTerm' => $searchTerm,

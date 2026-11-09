@@ -12,12 +12,15 @@ use App\Form\CategoryFormType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Image;
 use App\Form\ImageFormType;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController
 {
     #[Route('/admin/images', name: 'app_images')]
-    public function images(ManagerRegistry $doctrine, Request $request): Response
+    public function images(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
     {
         $image = new Image();
         $form = $this->createForm(ImageFormType::class, $image);
@@ -60,8 +63,13 @@ class AdminController extends AbstractController
             $entityManager->persist($image);
             $entityManager->flush();
         }
+
+        $repositorio = $doctrine->getRepository(Image::class);
+        $images = $repositorio->findAll();
+
         return $this->render('admin/images.html.twig', array(
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'images' => $images
         ));
     }
 
